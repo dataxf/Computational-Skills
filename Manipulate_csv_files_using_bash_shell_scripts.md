@@ -2,16 +2,16 @@
 
 ## Explore a csv file
 
-### How to view the entire file contents  
+### How to view the entire file contents? 
 
 `$ awk '{print $0}' file`  
 
 `$0` stands for the entire line  
 
 
-### How to view the first column of a csv file   
+### How to view the first column of a csv file?   
 
-Will `$ awk '{print $1}' file` work? 
+Will `$ awk '{print $1}' file` work?  
 `$1` stands for the first column
 
 It doesn't work, because it reads white space as the delimiter.  
@@ -26,22 +26,23 @@ Another way to do it is `$ awk  '{print $1}' FS="," file`
 ## Modify a csv file
 
 
-### How to add the filename as the first column in a csv file  
+### How to add the filename as the first column in a csv file?  
 
 `awk '{print FILENAME"," $0}' file`
 
 
-### How to remove rows from csv file after adding the filename in the prior step  
+### How to remove rows from csv file after adding the filename in the prior step?  
 
 Use`|` to pipe the steps together
 
 `awk '{print FILENAME"," $0}' file | tail -n +7`
 
 
-## How to modify many many more csv files
+## Process csv files in batch mode
 
 Say we have 100 csv files in a folder, we want to modify each of them in the same way. How can we do it fast?  
-We need a pipeline to run a sequence of commands on multiple files
+
+We need a pipeline to run a sequence of commands on multiple files.
 
 
 ### Start a bash script 
@@ -57,26 +58,32 @@ Type in the editor. Use a `for` loop to repeatly edit every csv file in the curr
 
 Type `i` to insert contents:
 
-`#!/bin/bash
+```
+#!/bin/bash
   set -e
   set -u
   set -o pipefail
 for each_file in *.csv
 do
    awk '{print FILENAME"," $0}' $each_file | tail -n +7 >> results
-done`
+done
+```
 
-Notes:
-`#!/bin/bash` indicates the path to the interpreter used to execute the script
-`set -e` prevents the shell script from proceeding if one of its commands fails
-`set -u` aborts a script if an unset variable is encountered
-`set -o pipefail` indicates any error in a pipe should cause exit
+**Notes:**  
+`#!/bin/bash` indicates the path to the interpreter used to execute the script  
+`set -e` prevents the shell script from proceeding if one of its commands fails  
+`set -u` aborts a script if an unset variable is encountered  
+`set -o pipefail` indicates any error in a pipe should cause exit  
 
-Type `esc` followed by `:wq` to save and exit
+Type `esc` followed by `:wq` to save and exit the editor 
 
 ### Running a bash script
+  
+Change the executable permission
+`chmod 700 try.sh`  
 
-`chmod 700 try.sh`
+
+Call the script as a program  
 `./try.sh`
 
 
@@ -87,9 +94,11 @@ Make a file that contains all the filenames as a long list, and then, loop throu
 
 `ls *.csv >> files.txt`
 
-`cat files.txt` check what we have in the new file named "files.txt"
+Check what we have in the new file named "files.txt"  
+`cat files.txt` 
 
-`#!/bin/bash
+```
+#!/bin/bash
   set -e
   set -u
   set -o pipefail
@@ -98,4 +107,5 @@ file_names=($(cut -f1 "$files"))
 for each_file in ${file_names[@]}
 do
    awk '{print FILENAME"," $0}' $each_file | tail -n +7 >> results
-done`
+done
+```
